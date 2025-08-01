@@ -18,8 +18,9 @@ router.get('/register', function(req, res, next) {
 router.post('/register', function(req, res, next) {
   const data = new userModel({
     username:req.body.username,
-    name:req.body.name,
-    email:req.body.email
+    name:req.body.name,                // yaha pe name: wali field data base schema me jo bnai hai wo hai
+    email:req.body.email,
+    contact:req.body.contact,      
 
   })
   userModel.register(data, req.body.password)
@@ -29,6 +30,24 @@ router.post('/register', function(req, res, next) {
   })
 })
 });
+
+
+router.get("/show/posts",isLoggedIn,async (req,res,next)=>{
+  const user = await userModel
+  .findOne({username:req.session.passport.user})
+  .populate("posts")
+  console.log(user);
+  
+  res.render("show",{user,nav: true})
+})
+
+router.get("/feed",isLoggedIn,async (req,res,next)=>{
+  const user = await userModel.findOne({username:req.session.passport.user})
+  const posts= await postModel.find()
+  .populate("user")
+
+  res.render("feed",{user,posts,nav:true})
+})
 
 
 router.get("/profile",isLoggedIn,async (req,res,next)=>{
